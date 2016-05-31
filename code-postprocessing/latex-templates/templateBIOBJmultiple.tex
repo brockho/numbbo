@@ -117,8 +117,6 @@
 
 \begin{document}
 
-\IfFileExists{\bbobdatapath ppfig2_f001.pdf}{2 algorithms currently not supported}{}
-
 %
 % --- Author Metadata here ---
 \conferenceinfo{GECCO'17,} {July 1-2, 2017, Berlin, Germany.}
@@ -748,4 +746,15 @@ multimodal-multimodal & multimodal-weakstructure & weakstructure-weakstructure &
 %
 
 % \clearpage % otherwise the last figure might be missing
+
+
+% display additional plots in case of comparing two algorithms, otherwise stop:
+\IfFileExists{\bbobdatapath ppfig2_f001.pdf}{}{\end{document}}
+
+\appendix
+
+
+\TODO{add plots for comparing two algorithms}
+
+
 \end{document}
