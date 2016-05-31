@@ -24,7 +24,7 @@ import shlex
 # -- General configuration ------------------------------------------------
 authors = "The BBOBies"
 # WHEN CHANGING THIS CHANGE ALSO the abstract in index.rst accordingly
-abstract = """
+abstract = """(this abstract might be outdated, see index.rst)
   \COCO\ is a platform for Comparing Continuous Optimizers in a black-box
   setting. 
   It aims at automatizing the tedious and repetitive task of
@@ -47,6 +47,10 @@ abstract = """
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.coverage',
+    'sphinx.ext.viewcode',
     'sphinx.ext.todo',
     'sphinx.ext.pngmath',  # low resolution
 #    'sphinx.ext.jsmath',  # javascript, older than mathjax, needs jsmath_path set
@@ -152,8 +156,6 @@ todo_include_todos = True
 
 # -- Options for HTML output ----------------------------------------------
 
-
-
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 html_theme = 'bizstyle'  # white/blue, quite good, too blue on the start page
@@ -201,7 +203,7 @@ html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
-#html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
@@ -271,31 +273,8 @@ latex_elements = {
   \usepackage{amssymb}
   \pagestyle{plain}
   \newcommand{\chapter}[1]{}  % hack to be able to use article documentclass
-  \newcommand{\ignore}[1]{}
+  \newcommand{\ignore}[1]{}  % never used
   \newcommand{\COCO}{\href{https://githum.com/numbbo/coco}{COCO}}
-  \newcommand{\abstracttext}{""" + abstract + r"""}
-
-%%%%%% TOGGLE the renewcommand to update toc / show abstract first %%%%%%
-  \newcommand{\generatetoc}{\boolean{true}}  % (re-)generate toc
-  \renewcommand{\generatetoc}{\boolean{false}}  % show first abstract and then toc
-
-  % abstract is latex-only in rst
-  \newcommand{\abstractinrst}{\begin{abstract}\abstracttext\end{abstract}} 
-  % abstract via redefinition of \tableofcontents
-  \ifthenelse{\generatetoc}{% do nothing here, \tableofcontents does the work
-    }{% redefine \tableofcontents such that the abstract can go first:
-    \renewcommand{\abstractinrst}{}
-    \renewcommand{\tableofcontents}{
-      \begin{abstract}\abstracttext\end{abstract}
-      \par\par
-      \section*{Contents}
-      \begin{minipage}{\textwidth}\setlength{\baselineskip}{3ex}
-        \makeatletter % changes the catcode of @ to 11  % see http://tex.stackexchange.com/questions/8351/what-do-makeatletter-and-makeatother-do
-        \input{coco-doc.toc}
-        \makeatother % changes the catcode of @ back to 12
-      \end{minipage}
-    }
-  }
 """ + latex_commands,
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
@@ -308,7 +287,20 @@ latex_documents = [
   (master_doc, 
    'coco-doc.tex', 
   u'{COCO}: {A} Platform for Comparing Continuous Optimizers in a Black-Box Setting',
-  u'The BBOBies', 
+  r"""Nikolaus Hansen$^{1,2}$, 
+      Anne Auger$^{1,2}$, 
+      Olaf Mersmann$^3$, 
+      Tea Tu\v{s}ar$^4$, 
+      Dimo Brockhoff$^4$
+  \\
+    $^1$Inria, research centre Saclay, France
+  \\
+   $^2$Universit\'e Paris-Saclay, LRI, France
+  \\
+    $^3$TU Dortmund University, Chair of Computational Statistics, Germany
+  \\
+    $^4$Inria, research centre Lille, France
+    """, 
    'article'),
 ]
 

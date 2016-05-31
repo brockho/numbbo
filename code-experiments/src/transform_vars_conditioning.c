@@ -25,6 +25,11 @@ static void transform_vars_conditioning_evaluate(coco_problem_t *problem, const 
   transform_vars_conditioning_data_t *data;
   coco_problem_t *inner_problem;
 
+  if (coco_vector_contains_nan(x, coco_problem_get_dimension(problem))) {
+  	coco_vector_set_to_nan(y, coco_problem_get_number_of_objectives(problem));
+  	return;
+  }
+
   data = (transform_vars_conditioning_data_t *) coco_problem_transformed_get_data(problem);
   inner_problem = coco_problem_transformed_get_inner_problem(problem);
 
@@ -56,8 +61,9 @@ static coco_problem_t *transform_vars_conditioning(coco_problem_t *inner_problem
   data->alpha = alpha;
   problem = coco_problem_transformed_allocate(inner_problem, data, transform_vars_conditioning_free, "transform_vars_conditioning");
   problem->evaluate_function = transform_vars_conditioning_evaluate;
-  if (!coco_problem_is_best_parameter_zero(inner_problem)) {
-      coco_warning("transform_vars_conditioning(): 'best_parameter' not updated");
-  }
-  return problem;
+
+  if (coco_problem_best_parameter_not_zero(inner_problem)) {
+    coco_warning("transform_vars_conditioning(): 'best_parameter' not updated, set to NAN");
+    coco_vector_set_to_nan(inner_problem->best_parameter, inner_problem->number_of_variables);
+  }  return problem;
 }

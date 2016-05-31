@@ -23,13 +23,13 @@ import shlex
 
 # -- General configuration ------------------------------------------------
 authors = "The BBOBies"
-abstract = """The ``bbob-biobj`` test suite contains 55 bi-objective functions
+# WHEN CHANGING THIS CHANGE ALSO the abstract in index.rst accordingly
+abstract = """(this abstract might be outdated, see index.rst)
+The ``bbob-biobj`` test suite contains 55 bi-objective functions
 in continuous domain which are derived from combining functions of the
-well-known single-objective noiseless ``bbob`` test suite. It will be used as
-the main test suite of the upcoming `BBOB-2016 workshop
-<http://numbbo.github.io/workshops/BBOB-2016/>`_ at GECCO. Besides giving the
+well-known single-objective noiseless ``bbob`` test suite. Besides giving the
 actual function definitions and presenting their (known) properties, this
-documentation also aims at giving the rational behind our approach in terms of
+documentation also aims at giving the rationale behind our approach in terms of
 function groups, instances, and potential objective space normalization.
 """
 
@@ -61,6 +61,16 @@ pngmath_dvipng_args = [ # see http://www.nongnu.org/dvipng/dvipng_4.html#Command
     '-bg', 'Transparent',
 #    '-T', '1.1in,1.3cm',   # image size, affects size, but nothing is rendered
 ]
+
+latex_commands = r"""
+  \newcommand{\R}{\ensuremath{\mathbb{R}}}
+  \newcommand{\ve}[1]{{\boldsymbol{#1}}}
+  \newcommand{\x}{\ensuremath{\ve{x}}}
+  \newcommand{\finstance}{\ensuremath{f^j}}
+"""
+
+pngmath_latex_preamble = latex_commands
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -140,18 +150,25 @@ todo_include_todos = True
 # a list of builtin themes.
 #html_theme = 'sphinx_rtd_theme'
 html_theme = 'bizstyle'  # white/blue, quite good, too blue on the start page
+#html_theme = 'nature'  # underlays of sections titles
+#html_theme = 'alabaster' #  white, times font 
+#html_theme = 'sphinxdoc'  # puts too much empty spaces left and right
+# html_theme = 'sphinx_rtd_theme'  # contents not structured (mobile style?)
+# html_theme = 'agogo'  # fixed width
+# html_theme = 'pyramid'  # relatively clean white/gray, sf font hard to read, too small section titles
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+# html_theme_options = {'font_family': 'goudy old style'}
+# sticky_navigation
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'COCO: The bbob-biobj Function Description'
+html_title = 'COCO: The Bi-objective Black-Box Optimization Benchmarking (bbob-biobj) Test Suite'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -206,7 +223,7 @@ html_last_updated_fmt = '%b %d, %Y'
 #html_show_sphinx = True
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-#html_show_copyright = True
+html_show_copyright = False
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
@@ -246,34 +263,10 @@ latex_elements = {# The paper size ('letterpaper' or 'a4paper').
   \usepackage{amssymb}
   \pagestyle{plain}
   \newcommand{\chapter}[1]{}  % hack to be able to use article documentclass
-  \newcommand{\ignore}[1]{}
-  \usepackage{amssymb}
-  \newcommand[1]{\ff}{f_{#1}}  
-  \newcommand{\abstracttextinconfpy}{""" + abstract + r"""}
-    
-
-%%%%%% TOGGLE the renewcommand to update toc / show abstract first %%%%%%
-  \newcommand{\generatetoc}{\boolean{true}}  % (re-)generate toc
-%  \renewcommand{\generatetoc}{\boolean{false}}  % show first abstract and then toc
-
-  % abstract is latex-only in rst
-  \newcommand{\abstractinrst}{\begin{abstract}\abstracttextinconfpy\end{abstract}} 
-  % abstract via redefinition of \tableofcontents
-  \ifthenelse{\generatetoc}{% do nothing here, \tableofcontents does the work
-    }{% redefine \tableofcontents such that the abstract can go first:
-    \renewcommand{\abstractinrst}{}
-    \renewcommand{\tableofcontents}{
-      \begin{abstract}\abstracttextinconfpy\end{abstract}
-      \par\par
-      \section*{Contents}
-      \begin{minipage}{\textwidth}\setlength{\baselineskip}{3ex}
-        \makeatletter % changes the catcode of @ to 11  % see http://tex.stackexchange.com/questions/8351/what-do-makeatletter-and-makeatother-do
-        \input{coco-experimental-setup.toc}
-        \makeatother % changes the catcode of @ back to 12
-      \end{minipage}
-    }
-  }
-""",
+  \newcommand{\ignore}[1]{}  % never used
+  \newcommand{\COCO}{\href{https://githum.com/numbbo/coco}{COCO}}
+  \newcommand{\ff}[1]{\ensuremath{f_{#1}}} 
+""" + latex_commands,
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
 }
@@ -283,7 +276,20 @@ latex_elements = {# The paper size ('letterpaper' or 'a4paper').
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   (master_doc, 'bbob-biobj-functions.tex', u'COCO: The Bi-objective Black Box Optimization Benchmarking (bbob-biobj) Test Suite',
-   u'The BBOBies', 'manual'),
+  r"""
+      Tea Tu\v{s}ar$^1$, 
+      Dimo Brockhoff$^1$,
+      Nikolaus Hansen$^{2,3}$, 
+      Anne Auger$^{2,3}$ 
+  \\
+    $^1$Inria, research centre Lille, France
+  \\
+    $^2$Inria, research centre Saclay, France
+  \\
+    $^3$Universit\'e Paris-Saclay, LRI, France
+    """, 
+   'article'  # 'manual'
+   ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -306,6 +312,7 @@ latex_documents = [
 # If false, no module index is generated.
 #latex_domain_indices = True
 
+# pngmath_latex_preamble = r"\newcommand{\R}{\mathbb{R}}"
 
 # -- Options for manual page output ---------------------------------------
 

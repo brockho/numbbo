@@ -30,9 +30,10 @@ import numpy, numpy as np
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 from . import genericsettings, findfiles, toolsstats, toolsdivers
-from .readalign import split, alignData, HMultiReader, VMultiReader, VMultiReaderNew, openfile
+from . import testbedsettings
+from .readalign import split, alignData, HMultiReader, VMultiReader, openfile
 from .readalign import HArrayMultiReader, VArrayMultiReader, alignArrayData
-from .ppfig import consecutiveNumbers
+from .ppfig import consecutiveNumbers, Usage
 
 do_assertion = genericsettings.force_assertions # expensive assertions
 targets_displayed_for_info = [10, 1., 1e-1, 1e-3, 1e-5, 1e-8]  # only to display info in DataSetList.info
@@ -190,7 +191,7 @@ class RunlengthBasedTargetValues(TargetValues):
         >>> os.chdir("..")
         >>> targets = bb.pproc.RunlengthBasedTargetValues([0.5, 1.2, 3, 10, 50])  # by default times_dimension==True
         >>> targets(fun_dim=(1, 20)) # doctest:+ELLIPSIS
-        Loading best algorithm data from BBOB-2009...   done ...
+        Loading best algorithm data from ...
         array([  6.30957345e+01,   5.75439938e+01,   1.00000000e-08,
                  1.00000000e-08,   1.00000000e-08])
         >>> os.chdir(cwd)
@@ -215,7 +216,7 @@ class RunlengthBasedTargetValues(TargetValues):
         else:
             return RunlengthBasedTargetValues(run_lengths_or_class_instance, *args, **kwargs)
         
-    def __init__(self, run_lengths, reference_data='bestGECCO2009',
+    def __init__(self, run_lengths, reference_data='bestAlgorithm',
                  smallest_target=1e-8, times_dimension=True, 
                  force_different_targets_factor=10**0.04,
                  unique_target_values=False,
@@ -226,7 +227,7 @@ class RunlengthBasedTargetValues(TargetValues):
         
         :param run_lengths: sequence of values. 
         :param reference_data: 
-            can be a string like ``"bestGECCO2009"`` or a dictionary
+            can be a string like ``"bestAlgorithm"`` or a dictionary
             of best data sets (e.g. from ``bestalg.generate(...)``)
             or a list of algorithm folder/data names (not thoroughly
             tested).
@@ -245,7 +246,7 @@ class RunlengthBasedTargetValues(TargetValues):
             defines "how much more difficult".
 
         TODO: check use case where ``reference_data`` is a dictionary similar
-        to ``bestalg.bestalgentries2009`` with each key dim_fun a reference
+        to ``bestalg.bestAlgorithmEntries`` with each key dim_fun a reference
         DataSet, computed by bestalg module or portfolio module.
 
             dsList, sortedAlgs, dictAlg = pproc.processInputArgs(args, verbose=verbose)
@@ -256,8 +257,6 @@ class RunlengthBasedTargetValues(TargetValues):
         self.reference_data = reference_data
         if force_different_targets_factor < 1:
             force_different_targets_factor **= -1 
-        # TODO: known_names collects only bestalg stuff, while also algorithm data can be used (see def initialize below) 
-        self.known_names = ['bestGECCO2009', 'bestGECCOever', 'bestBiobj2016'] # TODO: best-ever is not a time-invariant thing and therefore ambiguous
         self._short_info = "budget-based targets"
         self.run_lengths = sorted(run_lengths)
         self.smallest_target = smallest_target
@@ -273,25 +272,14 @@ class RunlengthBasedTargetValues(TargetValues):
         """lazy initialization to prevent slow import"""
         if self.initialized:
             return self
-        if self.reference_data in self.known_names: # bestalg data are loaded
+        if self.reference_data == 'bestAlgorithm': # bestalg data are loaded
             self.reference_algorithm = self.reference_data
             self._short_info = 'reference budgets from ' + self.reference_data
-            if self.reference_data == 'bestGECCO2009':
-                from bbob_pproc import bestalg
-                bestalg.loadBBOB2009() # this is an absurd interface
-                self.reference_data = bestalg.bestalgentries2009
-                # TODO: remove targets smaller than 1e-8 
-            elif self.reference_data == 'bestGECCOever':
-                from bbob_pproc import bestalg
-                bestalg.loadBBOBever() # this is an absurd interface
-                self.reference_data = bestalg.bestalgentriesever
-            elif self.reference_data == 'bestBiobj2016':
-                from bbob_pproc import bestalg
-                bestalg.loadBestBiobj2016() # this is an absurd interface
-                self.reference_data = bestalg.bestbiobjalgentries2016
-            else:
-                ValueError('reference algorithm name')
-        elif type(self.reference_data) is str:  # self.reference_data in ('RANDOMSEARCH', 'IPOP-CMA-ES') should work 
+
+            from . import bestalg
+            self.reference_data = bestalg.load_best_algorithm()
+            # TODO: remove targets smaller than 1e-8
+        elif type(self.reference_data) is str:  # self.reference_data in ('RANDOMSEARCH', 'IPOP-CMA-ES') should work
             self._short_info = 'reference budgets from ' + self.reference_data
             dsl = DataSetList(os.path.join(sys.modules[globals()['__name__']].__file__.split('bbob_pproc')[0], 
                                            'bbob_pproc', 'data', self.reference_data))  
@@ -342,6 +330,11 @@ class RunlengthBasedTargetValues(TargetValues):
         dim_fun = tuple(reversed(fun_dim))
         if fun_dim[0] > 100 and self.run_lengths[-1] * fun_dim[1]**self.times_dimension < 1e3:
             ValueError("short running times don't work on noisy functions")
+
+        if not self.reference_data:
+            raise ValueError, 'When running with the runlegth based target values ' \
+                              'the reference data (i.e. best algorithm) must exist.'
+
         ds = self.reference_data[dim_fun]
         if 11 < 3:   
             try:
@@ -607,6 +600,7 @@ class DataSet():
         readmaxevals
         splitByTrials
         target
+        testbed_name
         >>> all(ds.evals[:, 0] == ds.target)  # first column of ds.evals is the "target" f-value
         True
         >>> ds.evals[0::10, (0,5,6)]  # show row 0,10,20,... and of the result columns 0,5,6, index 0 is ftarget
@@ -664,10 +658,26 @@ class DataSet():
                    'indicator': ('indicator', str),
                    'folder': ('folder', str),
                    'algId': ('algId', str),
-                   'algorithm': ('algId', str)}
+                   'algorithm': ('algId', str),
+                   'suite': ('suite', str)}
 
     def isBiobjective(self):
         return hasattr(self, 'indicator')
+
+    def testbed_name(self):
+        testbed = None
+        if hasattr(self, 'suite'):
+            testbed = getattr(self, 'suite')
+
+        if not testbed:
+            if self.isBiobjective():
+                testbed = testbedsettings.default_testbed_bi
+            elif genericsettings.isNoisy:
+                testbed = testbedsettings.default_testbed_single_noisy
+            else:
+                testbed = testbedsettings.default_testbed_single
+
+        return testbed
     
     def __init__(self, header, comment, data, indexfile, verbose=True):
         """Instantiate a DataSet.
@@ -735,11 +745,12 @@ class DataSet():
                 # We just skip the element.
                 continue
             else:
-                # We take only the first 5 instances for the bi-objective case (for now).
-                if self.isBiobjective() and len(self.instancenumbers) >= 5:
-                    continue
-                
                 if not ':' in elem:
+                    
+                    # We take only the first 5 instances for the bi-objective case (for now).
+                    if self.isBiobjective() and ast.literal_eval(elem) > 5:
+                        continue
+
                     # if elem does not have ':' it means the run was not
                     # finalized properly.
                     self.instancenumbers.append(ast.literal_eval(elem))
@@ -754,6 +765,10 @@ class DataSet():
                     self.readfinalFminusFtarget.append(numpy.inf)
                 else:
                     itrial, info = elem.split(':', 1)
+                    # We take only the first 5 instances for the bi-objective case (for now).
+                    if self.isBiobjective() and ast.literal_eval(itrial) > 5:
+                        continue
+
                     self.instancenumbers.append(ast.literal_eval(itrial))
                     self.isFinalized.append(True)
                     readmaxevals, readfinalf = info.split('|', 1)
@@ -771,72 +786,72 @@ class DataSet():
         if verbose:
             print ("Processing %s: %d/%d trials found."
                    % (dataFiles, len(data), len(self.instancenumbers)))
-        (adata, maxevals, finalfunvals) = alignData(data, self.isBiobjective())
-        self.evals = adata
-        try:
-            for i in range(len(maxevals)):
-                self.maxevals[i] = max(maxevals[i], self.maxevals[i])
-                self.finalfunvals[i] = min(finalfunvals[i], self.finalfunvals[i])
-        except AttributeError:
-            self.maxevals = maxevals
-            self.finalfunvals = finalfunvals
+       
+        if data:
+            (adata, maxevals, finalfunvals) = alignData(data, self.isBiobjective())
+            self.evals = adata
+            try:
+                for i in range(len(maxevals)):
+                    self.maxevals[i] = max(maxevals[i], self.maxevals[i])
+                    self.finalfunvals[i] = min(finalfunvals[i], self.finalfunvals[i])
+            except AttributeError:
+                self.maxevals = maxevals
+                self.finalfunvals = finalfunvals
 
         dataFiles = list(os.path.join(filepath, os.path.splitext(i)[0] + '.tdat')
                          for i in self.dataFiles)
                              
         if not any(os.path.isfile(dataFile) for dataFile in dataFiles):
-            warnings.warn('Missing tdat files. Please rerun the experiments.')
-            dataFiles = list(os.path.join(filepath, os.path.splitext(i)[0] + '.dat')
-                             for i in self.dataFiles)
-            data = VMultiReaderNew(split(dataFiles, self.isBiobjective()), self.isBiobjective())
-        else:
-            data = VMultiReader(split(dataFiles, self.isBiobjective()), self.isBiobjective())
+            raise Usage("Missing tdat files in '{0}'. Please rerun the experiments." % filepath)
 
+        data = VMultiReader(split(dataFiles, self.isBiobjective()), self.isBiobjective())
         if verbose:
             print ("Processing %s: %d/%d trials found."
                    % (dataFiles, len(data), len(self.instancenumbers)))
-        (adata, maxevals, finalfunvals) = alignData(data, self.isBiobjective())
-        self.funvals = adata
-        try:
-            for i in range(len(maxevals)):
-                self.maxevals[i] = max(maxevals[i], self.maxevals[i])
-                self.finalfunvals[i] = min(finalfunvals[i], self.finalfunvals[i])
-        except AttributeError:
-            self.maxevals = maxevals
-            self.finalfunvals = finalfunvals
-        #TODO: take for maxevals the max for each trial, for finalfunvals the min...
-
-        #extensions = {'.dat':(HMultiReader, 'evals'), '.tdat':(VMultiReader, 'funvals')}
-        #for ext, info in extensions.iteritems(): # ext is defined as global
-            ## put into variable dataFiles the files where to look for data
-            ## basically append 
-            #dataFiles = list(i.rsplit('.', 1)[0] + ext for i in self.dataFiles)
-            #data = info[0](split(dataFiles))
-            ## split is a method from readalign, info[0] is a method of readalign
-            #if verbose:
-                #print ("Processing %s: %d/%d trials found." #% (dataFiles, len(data), len(self.itrials)))
-            #(adata, maxevals, finalfunvals) = alignData(data)
-            #setattr(self, info[1], adata)
-            #try:
-                #if all(maxevals > self.maxevals):
+        
+        if data:
+            (adata, maxevals, finalfunvals) = alignData(data, self.isBiobjective())
+            self.funvals = adata
+            try:
+                for i in range(len(maxevals)):
+                    self.maxevals[i] = max(maxevals[i], self.maxevals[i])
+                    self.finalfunvals[i] = min(finalfunvals[i], self.finalfunvals[i])
+            except AttributeError:
+                self.maxevals = maxevals
+                self.finalfunvals = finalfunvals
+            #TODO: take for maxevals the max for each trial, for finalfunvals the min...
+    
+            #extensions = {'.dat':(HMultiReader, 'evals'), '.tdat':(VMultiReader, 'funvals')}
+            #for ext, info in extensions.iteritems(): # ext is defined as global
+                ## put into variable dataFiles the files where to look for data
+                ## basically append 
+                #dataFiles = list(i.rsplit('.', 1)[0] + ext for i in self.dataFiles)
+                #data = info[0](split(dataFiles))
+                ## split is a method from readalign, info[0] is a method of readalign
+                #if verbose:
+                    #print ("Processing %s: %d/%d trials found." #% (dataFiles, len(data), len(self.itrials)))
+                #(adata, maxevals, finalfunvals) = alignData(data)
+                #setattr(self, info[1], adata)
+                #try:
+                    #if all(maxevals > self.maxevals):
+                        #self.maxevals = maxevals
+                        #self.finalfunvals = finalfunvals
+                #except AttributeError:
                     #self.maxevals = maxevals
                     #self.finalfunvals = finalfunvals
-            #except AttributeError:
-                #self.maxevals = maxevals
-                #self.finalfunvals = finalfunvals
-        #CHECKING PROCEDURE
-        tmp = []
-        for i in range(min((len(self.maxevals), len(self.readmaxevals)))):
-            tmp.append(self.maxevals[i] == self.readmaxevals[i])
-        if not all(tmp) or len(self.maxevals) != len(self.readmaxevals):
-            warnings.warn('There is a difference between the maxevals in the '
-                          '*.info file and in the data files.')
+            #CHECKING PROCEDURE
+            tmp = []
+            for i in range(min((len(self.maxevals), len(self.readmaxevals)))):
+                tmp.append(self.maxevals[i] == self.readmaxevals[i])
+            if not all(tmp) or len(self.maxevals) != len(self.readmaxevals):
+                warnings.warn('There is a difference between the maxevals in the '
+                              '*.info file and in the data files.')
 
-        self._cut_data()
-        # Compute aRT
-        self.computeERTfromEvals()
-        assert all(self.evals[0][1:] == 1)        
-        
+            self._cut_data()
+            # Compute aRT
+            self.computeERTfromEvals()
+            assert all(self.evals[0][1:] == 1)
+
     @property
     def evals_(self):
         """Shall become ``evals`` attribute in future.
@@ -863,7 +878,11 @@ class DataSet():
         does not exist.
         
         """
-        if isinstance(genericsettings.loadCurrentTestbed(self.isBiobjective(), TargetValues), genericsettings.GECCOBBOBTestbed):
+
+        if not testbedsettings.current_testbed:
+            testbedsettings.load_current_testbed(self.testbed_name(), TargetValues)
+
+        if isinstance(testbedsettings.current_testbed, testbedsettings.GECCOBBOBTestbed):
             Ndata = np.size(self.evals, 0)
             i = Ndata
             while i > 1 and not self.isBiobjective() and self.evals[i-1][0] <= self.precision:
@@ -964,13 +983,14 @@ class DataSet():
 
         The number of returned evals is ``self.nbRuns() * sample_size_per_instance``.
 
+        TODO: the return value is inconsistent between the code and the comment!
+
         TODO: attaching a count to each point would help to reduce the data size (and
         probably the plotting spead) significantly.
 
         """
         raise NotImplementedError()
         data_rows = self.detEvals(targets)
-        all_evals, all_counts = [], []
         for d in data_rows:
             evals, counts = toolsstats.runtimes_with_restarts(d, sample_size_per_instance)
             # this should become a runtimes class with a counts and an evals attribute
@@ -1533,8 +1553,9 @@ class DataSetList(list):
                     data_file_names.append(data)
                     nbLine += 3
                     #TODO: check that something is not wrong with the 3 lines.
-                    self.append(DataSet(header, comment, data, indexFile,
-                                        verbose))
+                    ds = DataSet(header, comment, data, indexFile, verbose)                    
+                    if len(ds.instancenumbers) > 0:                    
+                        self.append(ds)
                 except StopIteration:
                     break
             # Close index file
@@ -1756,13 +1777,25 @@ class DataSetList(list):
             groups = OrderedDict(sorted((key, key.replace('_', ' ')) for key in dictByFuncGroup.keys()))
             return groups
         else:
-            groups = OrderedDict([
-                ('separ', 'Separable functions'), 
-                ('lcond', 'Misc. moderate functions'), 
-                ('hcond', 'Ill-conditioned functions'), 
-                ('multi', 'Multi-modal functions'), 
-                ('mult2', 'Weak structure functions')]) 
-            return groups
+            groups = []
+            if any(i.funcId in range(1, 6) for i in self):
+                groups.append(('separ', 'Separable functions'))
+            if any(i.funcId in range(6, 10) for i in self):
+                groups.append(('lcond', 'Misc. moderate functions'))
+            if any(i.funcId in range(10, 15) for i in self):
+                groups.append(('hcond', 'Ill-conditioned functions'))
+            if any(i.funcId in range(15, 20) for i in self):
+                groups.append(('multi', 'Multi-modal functions'))
+            if any(i.funcId in range(20, 25) for i in self):
+                groups.append(('mult2', 'Weak structure functions'))
+            if any(i.funcId in range(101, 107) for i in self):
+                groups.append(('nzmod', 'Moderate noise'))
+            if any(i.funcId in range(107, 122) for i in self):
+                groups.append(('nzsev', 'Severe noise'))
+            if any(i.funcId in range(122, 131) for i in self):
+                groups.append(('nzsmm', 'Severe noise multimod.'))
+
+            return OrderedDict(groups)
 
     def dictByParam(self, param):
         """Returns a dictionary of DataSetList by parameter values.

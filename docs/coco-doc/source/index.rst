@@ -4,8 +4,12 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 COCO: A platform for Comparing Continuous Optimizers in a Black-Box Setting
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-.. ...
-.. %%%
+.. the next two lines are necessary in LaTeX. They will be automatically 
+  replaced to put away the \chapter level as ??? and let the "current" level
+  becomes \section. 
+
+.. CHAPTERTITLE
+.. CHAPTERUNDERLINE
 
 .. |
 .. |
@@ -15,36 +19,37 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 .. |
 .. |
 
-.. Here we put the abstract when using LaTeX, the \abstractinrst command is defined in 
-     the 'preamble' of latex_elements in source/conf.py, the text
-     is defined in `abstract` of conf.py. To flip abstract and 
-     table of contents, or update the table of contents, toggle 
-     the \generatetoc command in the 'preamble' accordingly. 
+.. raw:: html
+
+   <A HREF="http://arxiv.org/abs/1603.08785">arXiv:1603.08785</A>, 2016.
 
 .. raw:: latex
 
-    \abstractinrst
-    \newpage 
+  % \tableofcontents is automatic with sphinx and moved behind abstract by swap...py
+  \begin{abstract}
 
-.. WHEN CHANGING THIS CHANGE ALSO the abstract in conf.py ACCORDINGLY
+.. WHEN CHANGING THIS CHANGE ALSO the abstract in conf.py ACCORDINGLY (though it seems the latter is not used)
 
-.. raw:: html
-
-  COCO is a platform for Comparing Continuous Optimizers in a black-box
-  setting. 
-  It aims at automatizing the tedious and repetitive task of
-  benchmarking numerical optimization algorithms to the greatest possible
-  extent. 
-  We present the rationals behind the development of the platform
-  as a general proposition for a guideline towards better benchmarking. 
-  We detail underlying fundamental concepts of 
-  COCO such as its definition of
-  a problem, the idea of instances, the relevance of target values and runtime
-  as central performance measure. 
-  Finally, we  give a quick overview of the basic
-  code structure and the available test suites.
+COCO_ is a platform for Comparing Continuous Optimizers in a black-box
+setting. 
+It aims at automatizing the tedious and repetitive task of
+benchmarking numerical optimization algorithms to the greatest possible
+extent. 
+We present the rationals behind the development of the platform
+as a general proposition for a guideline towards better benchmarking. 
+We detail underlying fundamental concepts of 
+COCO_ such as its definition of
+a problem, the idea of instances, the relevance of target values, and runtime
+as central performance measure. 
+Finally, we  give a quick overview of the basic
+code structure and the available test suites.
   
+.. raw:: latex
+
+  \end{abstract}
+  \newpage
   
+
 .. _2009: http://www.sigevo.org/gecco-2009/workshops.html#bbob
 .. _2010: http://www.sigevo.org/gecco-2010/workshops.html#bbob
 .. _2012: http://www.sigevo.org/gecco-2012/workshops.html#bbob
@@ -113,6 +118,8 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 .. |x| replace:: :math:`\x`
 .. |l| replace:: :math:`l`
 
+.. role:: red
+.. |todo| replace:: **todo**
 
 .. #################################################################################
 .. #################################################################################
@@ -236,13 +243,13 @@ benchmarking far over a hundred algorithms by many researchers.
    scan and compare to each other, possibly across different articles. 
     
 .. Anne: Maybe we could actually make the point that with the COCO
-.. Anne: framework the focus can be on the algorithm design rather that on the
-.. Anne: implementation of the benchmarking test. Sadly, I have the feeling that some other
-.. Anne: benchmarking / challenge sessions are still popular because the people have the
-.. Anne: feeling they do more work (hence it's better). More precisely while they do not focus on
-.. Anne: the difficult task of designing a good algorithm (only need a small fancy idea like 
-.. Anne: imitating the fly of a chicken), they still have the feeling they achieve a consequent work 
-.. Anne: because they focus on implementing those long tests and writing their data in the latex.
+         framework the focus can be on the algorithm design rather that on the
+         implementation of the benchmarking test. Sadly, I have the feeling that some other
+         benchmarking / challenge sessions are still popular because the people have the
+         feeling they do more work (hence it's better). More precisely while they do not focus on
+         the difficult task of designing a good algorithm (only need a small fancy idea like 
+         imitating the fly of a chicken), they still have the feeling they achieve a consequent work 
+         because they focus on implementing those long tests and writing their data in the latex.
 
 .. Niko: I see your point, but I am not sure I am ready to even mention that 
   unnecessary work is not an achievement in itself. Secondly, at the moment
@@ -250,8 +257,6 @@ benchmarking far over a hundred algorithms by many researchers.
   entire COCO suite during the design process is usually the right way to go. This is
   probably a point which should be made though, but a rather lengthy argument to make. 
 
-.. technical hint @Anne: a comment is continued
-    on the next line by simple indentation, like in this comment. 
   
 
 Why COCO_?
@@ -276,25 +281,26 @@ the following defining features.
     #. scalable with the input dimension [WHI1996]_.
 
 #. There is no predefined budget (number of |f|-evaluations) for running an
-   experiment, the experimental procedure is *budget-free* [BBO2016ex]_.
+   experiment, the experimental procedure is *budget-free* [HAN2016ex]_.
 
 #. A single performance measure is used --- and thereafter aggregated and 
    displayed in 
    several ways --- namely **runtime**, *measured in 
-   number of* |f|-*evaluations* [BBO2016perf]_. Runtime has the advantage to 
+   number of* |f|-*evaluations* [HAN2016perf]_. Runtime has the advantages to 
 
    - be independent of the computational platform, language, compiler, coding 
      styles, and other specific experimental conditions [#]_
-   - be easily interpretable without expert domain knowledge
+   - be relevant, meaningful and easily interpretable without expert domain knowledge
    - be quantitative on the ratio scale [STE1946]_ [#]_
    - assume a wide range of values 
-   - aggregate over a collection of values in a very meaningful way
+   - aggregate over a collection of values in a meaningful way
      
    A *missing* runtime value is considered as possible outcome (see below).
     
-#. The display is as comprehensible, intuitive and informative as possible. 
+#. The display is as comprehensible, intuitive and informative as possible, 
+   We believe that details matter. 
    Aggregation over dimension is avoided, because dimension is an a priori
-   known parameter that can and should be used for algorithm selection
+   known parameter that can and should be used for algorithm design or selection
    decisions. 
 
 .. [#] For example, the optimum is not in all-zeros, optima are not placed 
@@ -305,7 +311,7 @@ the following defining features.
 
 .. [#] Runtimes measured in |f|-evaluations are widely
        comparable and designed to stay. The experimental procedure
-       [BBO2016exp] includes however a timing experiment which records the
+       [HAN2016ex]_ includes however a timing experiment which records the
        internal computational effort of the algorithm in CPU or wall clock time. 
 
 .. [#] As opposed to a ranking of algorithm based on their solution quality
@@ -419,14 +425,14 @@ Runtime and Target Values
 In order to measure the runtime of an algorithm on a problem, we
 establish a hitting time condition. 
 We prescribe a **target value**, |t|, which is an |f|- or
-indicator-value [BBO2016biobj]_. 
+indicator-value [TUS2016]_. 
 For a single run, when an algorithm reaches or surpasses the target value |t|
 on problem |p|, we say it has *solved the problem* |pt| --- it was successful. [#]_
 
 Now, the **runtime** is the evaluation count when the target value |t| was
 reached or surpassed for the first time. 
 That is, runtime is the number of |f|-evaluations needed to solve the problem
-|pt| (but see also Recommendations_ in [BBO2016ex]_). [#]_
+|pt| (but see also Recommendations_ in [HAN2016ex]_). [#]_
 *Measured runtimes are the only way of how we assess the performance of an 
 algorithm.* [#]_
 
@@ -464,7 +470,7 @@ restarts should be done.
     reader. 
     Fortunately, there is an automatized generic way to generate target values
     from observed runtimes, the so-called run-length based target values
-    [BBO2016perf]_. 
+    [HAN2016perf]_. 
     
 .. [#] Observed success rates can (and should) be translated into lower bounds 
     on runtimes on a subset of problems. 
@@ -490,11 +496,11 @@ Independent restarts tend to increase the success rate, but they generally do
 not *change* the performance *assessment*, because the successes materialize at
 greater runtimes. 
 Therefore, we call our approach *budget-free*. 
-Restarts however "*improve the reliability, comparability, precision, and "visibility" of the measured results*" [BBO2016ex]_.
+Restarts however "*improve the reliability, comparability, precision, and "visibility" of the measured results*" [HAN2016ex]_.
 
-*Simulated restarts* [HAN2010]_ [HAN2010b]_ [BBO2016perf]_ are used to determine a runtime for unsuccessful runs. Semantically, this is only valid if we interpret different 
+*Simulated restarts* [HAN2010ex]_ [HAN2010]_ [HAN2016perf]_ are used to determine a runtime for unsuccessful runs. Semantically, this is only valid if we interpret different 
 instances as random repetitions. 
-Resembling the bootstrapping method [EFR1993]_, when we face an unsolved problem, we draw uniformly at random a
+Resembling the bootstrapping method [EFR1994]_, when we face an unsolved problem, we draw uniformly at random a
 new |j| until we find an instance such that |pt| was solved. [#]_
 The evaluations done on the first unsolved problem and on all subsequently
 drawn unsolved problems are added to the runtime on the last problem and
@@ -513,7 +519,7 @@ This method is applied if a problem instance was not solved and is
 
 .. [#] More specifically, we consider the problems :math:`(f_i, n, j, t(j))` for
   all benchmarked instances |j|. The targets :math:`t(j)` depend on the instance 
-  in a way to make the problems comparable [BBO2016perf]_. 
+  in a way to make the problems comparable [HAN2016perf]_. 
 
 
 Aggregation
@@ -526,7 +532,7 @@ To make them amenable to the experimenter, we need to summarize these data.
 
 
 Our idea behind an aggregation is to make a statistical summary over a set or
-subset of *problems of interest* over which we assume a uniform distribution [BBO2016perf]_. 
+subset of *problems of interest* over which we assume a uniform distribution [HAN2016perf]_. 
 From a practical perspective this means to have no simple way to distinguish
 between these problems and to select an optimization algorithm accordingly---in
 which case an aggregation would have no significance---and that we are likely
@@ -545,7 +551,7 @@ We have several ways to aggregate the resulting runtimes.
    natural way easy problems from difficult problems for the considered
    algorithm. We usually display |ECDFs| on the log scale, which makes the area
    above the curve and the *difference area* between two curves a meaningful
-   conception [BBO2016perf]_. 
+   conception [HAN2016perf]_. 
    
    .. object/concept/element/notion/aspect/component. 
  
@@ -560,7 +566,7 @@ We have several ways to aggregate the resulting runtimes.
  - Restarts and simulated restarts, see Section :ref:`sec:Restarts`, do not 
    literally aggregate runtimes (which are literally defined only when |t| was
    hit).  They aggregate, however, time data to eventually supplement missing runtime
-   values, see also [BBO2016perf]_. 
+   values, see also [HAN2016perf]_. 
 
 .. |ERT| replace:: ERT
 .. |ECDF| replace:: ECDF
@@ -601,44 +607,49 @@ Currently, the COCO_ framework provides three different test suites.
   currently only implemented in the `old code basis`_.
 
 ``bbob-biobj``
-  contains 55 bi-objective (:math:`m=2`) functions in 15 subgroups [BBO2016biobj]_. 
+  contains 55 bi-objective (:math:`m=2`) functions in 15 subgroups [TUS2016]_. 
   
 .. _`old code basis`: http://coco.gforge.inria.fr/doku.php?id=downloads
 
 
-Acknowledgments
-================
-The authors would like to thank Raymond Ros, Steffen Finck, Marc Schoenauer, 
-and Petr Posik for their many invaluable contributions to this work. 
+.. raw:: html
+    
+    <H2>Acknowledgments</H2>
+
+.. raw:: latex
+
+    \section*{Acknowledgments}
+
+The authors would like to thank Raymond Ros, Steffen Finck, Marc Schoenauer,  
+Petr Posik and Dejan Tušar for their many invaluable contributions to this work. 
 
 The authors also acknowledge support by the grant ANR-12-MONU-0009 (NumBBO) 
 of the French National Research Agency.
 
 
-.. ############################# References #########################################
+.. ############################# References ###################################
 .. raw:: html
     
     <H2>References</H2>
-    
-.. author list yet to be defined
 
-.. [BBO2016biobj] The BBOBies: `COCO: The Bi-objective Black Box Optimization Benchmarking (bbob-biobj) Test Suite`__.
-__ http://numbbo.github.io/coco-doc/bbob-biobj/functions/ 
+.. this document: 
+.. .. [HAN2016co] N. Hansen, A. Auger, O. Mersmann, T. Tušar, D. Brockhoff (2016).
+   `COCO: A Platform for Comparing Continuous Optimizers in a Black-Box 
+   Setting`__. *ArXiv e-prints*, `arXiv:1603:08785`__.
+.. .. __ http://numbbo.github.io/coco-doc/
+.. .. __ http://arxiv.org/abs/1603.08785
 
-.. [BBO2016ex] The BBOBies: `COCO: Experimental Procedure`__. 
-__ http://numbbo.github.io/coco-doc/experimental-setup/
+.. [HAN2016perf] N. Hansen, A. Auger, D. Brockhoff, D. Tušar, T. Tušar (2016). 
+  `COCO: Performance Assessment`__. *ArXiv e-prints*, `arXiv:160x:xxxxx`__
+__ http://numbbo.github.io/coco-doc/perf-assessment
+__ http://arxiv.org/abs/160x.xxxxx
 
-.. [BBO2016perf] The BBOBies: `Performance Assessment`__. 
-__ https://www.github.com
+.. .. [HAN2009] N. Hansen, A. Auger, S. Finck, and R. Ros (2009). Real-Parameter Black-Box Optimization Benchmarking 2009: Experimental Setup, *Inria Research Report* RR-6828 http://hal.inria.fr/inria-00362649/en
 
-.. .. [BBO2016fun] The BBOBies: Biobjective Function Definitions. 
-
-.. .. [HAN2009] N. Hansen, A. Auger, S. Finck, and R. Ros (2009), Real-Parameter Black-Box Optimization Benchmarking 2009: Experimental Setup, *Inria Research Report* RR-6828 http://hal.inria.fr/inria-00362649/en
-
-.. [HAN2010] N. Hansen, A. Auger, S. Finck, and R. Ros (2010), 
+.. [HAN2010ex] N. Hansen, A. Auger, S. Finck, and R. Ros (2010). 
   Real-Parameter Black-Box Optimization Benchmarking 2010: Experimental Setup, *Inria Research Report* RR-7215 http://hal.inria.fr/inria-00362649/en
 
-.. [HAN2010b] N. Hansen, A. Auger, R. Ros, S. Finck, and P. Posik (2010). 
+.. [HAN2010] N. Hansen, A. Auger, R. Ros, S. Finck, and P. Posik (2010). 
   Comparing Results of 31 Algorithms from the Black-Box Optimization Benchmarking BBOB-2009. Workshop Proceedings of the GECCO Genetic and Evolutionary Computation Conference 2010, ACM, pp. 1689-1696
 
 .. [HAN2009fun] N. Hansen, S. Finck, R. Ros, and A. Auger (2009). 
@@ -651,8 +662,14 @@ __ https://www.github.com
 .. __: http://coco.gforge.inria.fr/
 .. __: https://hal.inria.fr/inria-00369466
 
-.. [HUN2007] J. D. Hunter (2007). Matplotlib: A 2D graphics environment, 
+.. [HAN2016ex] N. Hansen, T. Tušar, A. Auger, D. Brockhoff, O. Mersmann (2016). 
+   `COCO: Experimental Procedure`__, *ArXiv e-prints*, `arXiv:1603.08776`__.
+__ http://numbbo.github.io/coco-doc/experimental-setup/
+__ http://arxiv.org/abs/1603.08776
+
+.. [HUN2007] J. D. Hunter (2007). `Matplotlib`__: A 2D graphics environment, 
   *Computing In Science \& Engineering*, 9(3): 90-95. 
+.. __: http://matplotlib.org/
 
 .. .. [AUG2005] A. Auger and N. Hansen. A restart CMA evolution strategy with
    increasing population size. In *Proceedings of the IEEE Congress on
@@ -666,8 +683,8 @@ __ https://www.github.com
    
 .. .. [BAR1995] R. S. Barr, B. L. Golden, J. P. Kelly, M. G. C. Resende, and W. R. Stewart Jr. Designing and Reporting on Computational Experiments with Heuristic Methods. Journal of Heuristics, 1:9–32, 1995. 
 
-.. [EFR1993] B. Efron and R. Tibshirani (1993). An introduction to the
-   bootstrap. Chapman & Hall/CRC.
+.. [EFR1994] B. Efron and R. Tibshirani (1994). *An introduction to the
+   bootstrap*. CRC Press.
 .. [HAR1999] G. R. Harik and F. G. Lobo (1999). A parameter-less genetic
    algorithm. In *Proceedings of the Genetic and Evolutionary Computation
    Conference (GECCO)*, volume 1, pages 258-265. ACM.
@@ -688,6 +705,12 @@ __ https://www.github.com
    
 .. [STE1946] S.S. Stevens (1946). 
   On the theory of scales of measurement. *Science* 103(2684), pp. 677-680.
+
+.. [TUS2016] T. Tušar, D. Brockhoff, N. Hansen, A. Auger (2016). 
+  `COCO: The Bi-objective Black Box Optimization Benchmarking (bbob-biobj) 
+  Test Suite`__, *ArXiv e-prints*, `arXiv:1604.00359`__.
+.. __: http://numbbo.github.io/coco-doc/bbob-biobj/functions/
+.. __: http://arxiv.org/abs/1604.00359
 
 .. [WHI1996] D. Whitley, S. Rana, J. Dzubera, K. E. Mathias (1996). 
   Evaluating evolutionary algorithms. *Artificial intelligence*, 85(1), 245-276.
