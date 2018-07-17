@@ -95,7 +95,52 @@ instancesOfInterest = [instancesOfInterest2009,
                        instancesOfInterestBiobj2017,
                        instancesOfInterestBiobj2018]
 
-line_styles = [  # used by ppfigs and pprlmany  
+line_styles = [  # used by ppfigs and pprlmany
+    {'marker': 'o', 'markersize': 31, 'linestyle': '-', 'color': '#000080'},  # 'NavyBlue'
+    {'marker': '*', 'markersize': 33, 'linestyle': '-', 'color': '#ffa500'},  # 'Orange'
+    {'marker': 'v', 'markersize': 28, 'linestyle': '-', 'color': '#41b0e4'},  # 'CornflowerBlue'
+    {'marker': 'h', 'markersize': 30, 'linestyle': '-', 'color': 'r'},        # 'Red'
+    {'marker': '1', 'markersize': 23, 'linestyle': '-', 'color': '#228b22'},  # 'ForestGreen'
+    {'marker': 'p', 'markersize': 25, 'linestyle': '-', 'color': '#99479b'},  # 'Purple'
+    {'marker': 'd', 'markersize': 25, 'linestyle': '-', 'color': '#af72b0'},  # 'Orchid'
+    {'marker': '4', 'markersize': 26, 'linestyle': '-', 'color': '#ff00ff'},  # 'Magenta'
+    {'marker': '^', 'markersize': 25, 'linestyle': '-', 'color': '#9acd32'},  # 'YellowGreen'
+    {'marker': '<', 'markersize': 24, 'linestyle': '-', 'color': 'c'},
+    {'marker': '>', 'markersize': 23, 'linestyle': '-', 'color': '#adff2f'},  # 'GreenYellow'
+    {'marker': 's', 'markersize': 23, 'linestyle': '-', 'color': '#87ceeb'},  # 'SkyBlue' close to CornflowerBlue
+    {'marker': 'D', 'markersize': 23, 'linestyle': '-', 'color': '#ffd700'},  # 'Goldenrod'
+    {'marker': 'H', 'markersize': 23, 'linestyle': '-', 'color': '#d02090'},  # square, 'VioletRed'
+    {'marker': '3', 'markersize': 23, 'linestyle': '-', 'color': '#32cd32'},  # 'LimeGreen'
+    {'marker': 'o', 'markersize': 25, 'linestyle': '-', 'color': '#0085bc'},  # 'RoyalBlue'
+    {'marker': '*', 'markersize': 27, 'linestyle': '-', 'color': '#7977b8'},  # 'Periwinkle'
+    {'marker': 'v', 'markersize': 21, 'linestyle': '-', 'color': '#1f77b4'},  # 'Blue',
+    {'marker': 'h', 'markersize': 24, 'linestyle': '-', 'color': '#74729a'},  # 'CadetBlue'
+    {'marker': '1', 'markersize': 24, 'linestyle': '-', 'color': '#006795'},  # 'MidnightBlue'
+    {'marker': 'p', 'markersize': 23, 'linestyle': '-', 'color': '#bebebe'},  # 'Gray'
+    {'marker': 'd', 'markersize': 23, 'linestyle': '-', 'color': '#000080'},  # 'NavyBlue'
+    {'marker': '4', 'markersize': 23, 'linestyle': '-', 'color': '#ffa500'},  # 'Orange'
+    {'marker': '^', 'markersize': 23, 'linestyle': '-', 'color': '#41b0e4'},  # 'CornflowerBlue'
+    {'marker': '<', 'markersize': 23, 'linestyle': '-', 'color': 'r'},        # 'Red'
+    {'marker': '>', 'markersize': 23, 'linestyle': '-', 'color': '#228b22'},  # 'ForestGreen'
+    {'marker': 's', 'markersize': 22, 'linestyle': '-', 'color': '#99479b'},  # 'Purple'
+    {'marker': 'D', 'markersize': 22, 'linestyle': '-', 'color': '#af72b0'},  # 'Orchid'
+    {'marker': 'H', 'markersize': 22, 'linestyle': '-', 'color': '#ff00ff'},  # 'Magenta'
+    {'marker': '3', 'markersize': 22, 'linestyle': '-', 'color': '#9acd32'},  # 'YellowGreen'
+    {'marker': 'o', 'markersize': 22, 'linestyle': '-', 'color': 'c'},
+    {'marker': '*', 'markersize': 20, 'linestyle': '-', 'color': '#adff2f'},  # 'GreenYellow'
+    {'marker': 'v', 'markersize': 17, 'linestyle': '-', 'color': '#87ceeb'},  # 'SkyBlue' close to CornflowerBlue
+    {'marker': 'h', 'markersize': 19, 'linestyle': '-', 'color': '#ffd700'},  # 'Goldenrod'
+    {'marker': '1', 'markersize': 19, 'linestyle': '-', 'color': '#d02090'},  # square, 'VioletRed'
+    {'marker': 'p', 'markersize': 19, 'linestyle': '-', 'color': '#32cd32'},  # 'LimeGreen'
+    {'marker': 'd', 'markersize': 19, 'linestyle': '-', 'color': '#0085bc'},  # 'RoyalBlue'
+    {'marker': '4', 'markersize': 19, 'linestyle': '-', 'color': '#7977b8'},  # 'Periwinkle'
+    {'marker': '^', 'markersize': 19, 'linestyle': '-', 'color': '#1f77b4'}, # 'Blue',
+    {'marker': '<', 'markersize': 19, 'linestyle': '-', 'color': '#74729a'},  # 'CadetBlue'
+    {'marker': '>', 'markersize': 19, 'linestyle': '-', 'color': '#006795'},  # 'MidnightBlue'
+    {'marker': 's', 'markersize': 19, 'linestyle': '-', 'color': '#bebebe'},  # 'Gray'
+]
+
+line_stylesCURRENT = [  # used by ppfigs and pprlmany
     {'marker': 'o', 'markersize': 31, 'linestyle': '-', 'color': '#000080'},  # 'NavyBlue'
     {'marker': 'd', 'markersize': 26, 'linestyle': '-', 'color': '#ff00ff'},  # 'Magenta'
     {'marker': '*', 'markersize': 33, 'linestyle': '-', 'color': '#ffa500'},  # 'Orange'
