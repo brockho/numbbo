@@ -381,16 +381,16 @@ def main(arguments):
         with InfolderGoneWithTheWind():
             t0 = time.time()
             result = os.system(python + command +
-                               join_path(recent_data_path, 'RS-la'))
-            print('**  subtest 14 finished in ', time.time() - t0, ' seconds')
-            assert result == 0, 'Test failed: rungeneric on newly generated random search data on `bbob-largescale`.'
+                               join_path(recent_data_path, 'RS-mi'))
+            print('**  subtest 15 finished in ', time.time() - t0, ' seconds')
+            assert result == 0, 'Test failed: rungeneric on newly generated random search data on `bbob-mixint`.'
 
         with InfolderGoneWithTheWind():
             t0 = time.time()
             result = os.system(python + command +
-                               join_path(recent_data_path, 'RS-mi'))
-            print('**  subtest 15 finished in ', time.time() - t0, ' seconds')
-            assert result == 0, 'Test failed: rungeneric on newly generated random search data on `bbob-mixint`.'
+                               join_path(recent_data_path, 'RS-la'))
+            print('**  subtest 14 finished in ', time.time() - t0, ' seconds')
+            assert result == 0, 'Test failed: rungeneric on newly generated random search data on `bbob-largescale`.'
 
         with InfolderGoneWithTheWind():
             t0 = time.time()
